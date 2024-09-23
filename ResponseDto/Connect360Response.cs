@@ -1,0 +1,24 @@
+﻿using Newtonsoft.Json;
+
+namespace sassy.bulk.ResponseDto
+{
+    internal class Connect360Response
+    {
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+        [JsonProperty("message")]
+        public string Message { get; set; }
+        [JsonProperty("responseStatusCode")]
+        public string ResponseStatusCode { get; set; }
+        [JsonProperty("data")]
+        public object Data { get; set; }
+        [JsonProperty("code")]
+        public string Code { get; set; }
+        [JsonProperty("totalRecords")]
+        public int TotalRecords { get; set; } = 0;
+        [JsonProperty("elapsedTime")]
+        public string ElapsedTime { get; set; }
+        [JsonProperty("showThisMessage")]
+        public bool ShowThisMessage { get; set; }
+    }
+}
