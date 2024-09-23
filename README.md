@@ -24,5 +24,3 @@ The app will generate model data based on your input, including:
 
 The app will send the generated data to :
 * `Sassy POS APIs`
-
-## Examples
