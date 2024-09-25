@@ -2,8 +2,12 @@
 {
     public static class ClientEndPoints
     {
-        public static string BaseUrl { get; private set; } = "https://lsapim.azure-api.net/";
-        public static string SaveInvoice { get; private set; } = "order-svc/api/SaveInvoiceV1";
-        public static string CreateCustomer { get; private set; } = "customer-svc/api/Customer";
+        public static string BaseLinscellUrl { get; private set; } = "https://lsapim.azure-api.net/";
+        public static string BaseSassylUrl { get; private set; } = "https://connect360-stg.azure-api.net/";
+        public static string CustomerService { get; private set; } = "customer-svc/api";
+        public static string OrderService { get; private set; } = "order-svc/api";
+        public static string SaveInvoice { get; private set; } = "/SaveInvoiceV1";
+        public static string CreateCustomer { get; private set; } = "/Customer";
+        public static string SearchCustomer { get; private set; } = "/SearchCustomer/";
     }
 }

@@ -13,6 +13,6 @@ namespace InvoiceBulkRegisteration.Infrastructure
     {
         public static IConfigurationBuilder AddCustomConfiguration(this IConfigurationBuilder configurationBuilder) =>
             configurationBuilder
-            .AddJsonFile("app.settings.json", false, false);
+            .AddJsonFile($"app.settings.json", false, false);
     }
 }

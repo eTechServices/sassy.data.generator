@@ -1,9 +1,15 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace InvoiceBulkRegisteration.Dtos
 {
     public class SampleCustomerDto
     {
+        public SampleCustomerDto()
+        {
+            Id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+        }
+
         [JsonProperty("Id")]
         public string Id { get; set; }
         [JsonProperty("firstName")]
