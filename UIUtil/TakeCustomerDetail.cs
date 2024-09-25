@@ -1,6 +1,9 @@
 ﻿using InvoiceBulkRegisteration.Dtos;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using sassy.bulk.UIUtil.Abstract;
 using System;
+using System.Collections.Generic;
 
 namespace sassy.bulk.UIUtil
 {
@@ -8,14 +11,28 @@ namespace sassy.bulk.UIUtil
     {
         public override void StartScreen()
         {
+            var dataset = new List<SampleCustomerDto>();
             Console.WriteLine("Please enter customer details");
             Console.WriteLine("-----------------------------");
-            _ = TakeDetails();
-
-            Console.WriteLine("Do you want to Add another?");
+            while (true)
+            {
+                var customerData = TakeDetails();
+                dataset.Add(customerData);
+                string isAnother = Input("Do you want to Add another?: ");
+                if (isAnother == "yes" || isAnother == "y")
+                {
+                    int howMany = InputInt("How many do you want to add: ");
+                    for(int i = 0; i < howMany; i++)
+                    {
+                        Console.WriteLine($"--------------{dataset.Count}--------------");
+                        dataset.Add(TakeDetails());
+                    }
+                    Console.WriteLine($"{dataset.Count} customers added successfully");
+                    Console.WriteLine(JsonConvert.SerializeObject(dataset));
+                }
+                break;
+            }
         }
-
-
         private SampleCustomerDto TakeDetails()
         {
             string firstName = TakeInput("First Name: ");

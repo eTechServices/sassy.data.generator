@@ -16,7 +16,7 @@ namespace sassy.bulk.Dtos
         public string InvoiceNumber { get; set; }
         public string RefInvoiceNumber { get; set; }
         public string ReturnInvoiceNumbers { get; set; }
-        public IEnumerable<string> ReturnedInvoices { get => ReturnInvoiceNumbers.StringToEnumerable(); }
+        public IEnumerable<string> ReturnedInvoices { get => ReturnInvoiceNumbers.ToEnumerable(); }
         [JsonProperty("customerId")]
         public string CustomerId { get; set; } = "OTM2NDQ2NjY5MA==";
         [JsonProperty("customerName")]
@@ -72,11 +72,11 @@ namespace sassy.bulk.Dtos
         public int TotalVoidItems { get; set; }
         [JsonProperty("invoiceItems")]
         public List<InvoiceItemDto> InvoiceItems { get; set; }
-        [JsonProperty("Discounts")]
+        [JsonProperty("discounts")]
         public List<InvoiceDiscountDto> InvoiceDiscounts { get; set; }
-        [JsonProperty("Tenders")]
+        [JsonProperty("tenders")]
         public List<InvoiceTenderDto> InvoiceTenders { get; set; }
-        [JsonProperty("ProductNotes")]
+        [JsonProperty("productNotes")]
         public List<InvoiceProductNoteDto> InvoiceProductNotes { get; set; }
         [JsonProperty("electronicTenders")]
         public List<ElectronicTenderDto> ElectronicTenders { get; set; }

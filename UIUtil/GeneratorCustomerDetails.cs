@@ -1,4 +1,5 @@
-﻿using sassy.bulk.DataGenerator;
+﻿using Newtonsoft.Json;
+using sassy.bulk.DataGenerator;
 using sassy.bulk.UIUtil.Abstract;
 using System;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace sassy.bulk.UIUtil
                     {
                         case "yes":
                         case "y":
+                            string token = TakeInput("Please enter token to send: ");
                             foreach (var item in fakecustomer)
                             {
                                 int currentIteration = fakecustomer.ToList().IndexOf(item) + 1;
@@ -31,7 +33,12 @@ namespace sassy.bulk.UIUtil
                             break;
                         case "no":
                         case "n":
-
+                            foreach (var item in fakecustomer)
+                            {
+                                int currentIteration = fakecustomer.ToList().IndexOf(item) + 1;
+                                ProgressBar(currentIteration, choice);
+                                PrintData(JsonConvert.SerializeObject(item));
+                            }
                             break;
                     }
                 }
