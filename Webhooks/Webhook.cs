@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using InvoiceBulkRegisteration.Logging;
+using Newtonsoft.Json;
 using sassy.bulk.Exception;
 using System;
 using System.Collections.Generic;
@@ -26,15 +27,16 @@ namespace sassy.bulk.Webhooks
         public static async Task<HttpResponseMessage> SendAsync<TData>(string endPoint, TData data, string contentType, IEnumerable<KeyValuePair<string, string>> additionalHeaders = null, CancellationToken token = default)
         {
             var request = CreateRequest(HttpMethod.Post, endPoint, data, contentType, additionalHeaders);
-            HttpResponseMessage response;
+            HttpResponseMessage response = null;
             token.ThrowIfCancellationRequested();
             try
             {
                 response = await _httpClient.PostAsync(endPoint, request.Content, token).ConfigureAwait(false);
             }
-            catch (BulkDataExeException)
+            catch (BulkDataExeException e)
             {
-                throw;
+                var logService = new LogService();
+                logService.Exception(e);
             }
             return response;
         }
@@ -49,32 +51,35 @@ namespace sassy.bulk.Webhooks
         /// <param name="additionalHeaders">Additional headers to include in the request.</param>
         /// <param name="token">A cancellation token to signal that the operation should be canceled.</param>
         /// <returns>A task that represents the asynchronous operation. The task result will be either the deserialized success response object or the deserialized error response object.</returns>
-        public static async Task<object> GetAsync<TEntity, TError>(string endPoint, string contentType, IEnumerable<KeyValuePair<string, string>> additionalHeaders = null, CancellationToken token = default) where TEntity : class where TError : class
+        public static async Task<object> SendAsync<TEntity, TError>(string endPoint, string contentType, IEnumerable<KeyValuePair<string, string>> additionalHeaders = null, CancellationToken token = default) where TEntity : class where TError : class
         {
             var request = CreateRequest(HttpMethod.Get, endPoint, null, contentType, additionalHeaders);
             token.ThrowIfCancellationRequested();
-            HttpResponseMessage response;
+            HttpResponseMessage response = null;
             try
             {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", BearerToken);
                 response = await _httpClient.GetAsync(endPoint, token).ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TEntity entity;
+                    var stringContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    entity = JsonConvert.DeserializeObject<TEntity>(stringContent);
+                    return entity;
+                }
+                if (!response.IsSuccessStatusCode)
+                {
+                    TError error;
+                    var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    error = JsonConvert.DeserializeObject<TError>(errorContent);
+                    return error;
+                }
             }
             catch (BulkDataExeException ex)
             {
-                throw new BulkDataExeException(ex);
-            }
-            if (response.IsSuccessStatusCode)
-            {
-                TEntity entity;
-                var stringContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                entity = JsonConvert.DeserializeObject<TEntity>(stringContent);
-                return entity;
-            }
-            if (!response.IsSuccessStatusCode)
-            {
-                TError error;
-                var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                error = JsonConvert.DeserializeObject<TError>(errorContent);
-                return error;
+                var logService = new LogService();
+                logService.Exception(ex);
             }
             return null;
         }

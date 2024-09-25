@@ -11,7 +11,7 @@ namespace sassy.bulk.Dtos
     public class SaleInvoiceDto
     {
         [JsonProperty("orderNo")]
-        public int OrderNo { get; set; }
+        public int OrderNo { get; set; } = 1;
         [JsonProperty("invoiceNumber")]
         public string InvoiceNumber { get; set; }
         public string RefInvoiceNumber { get; set; }

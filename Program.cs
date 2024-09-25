@@ -2,7 +2,7 @@
 using InvoiceBulkRegisteration.Logging;
 using Microsoft.Extensions.Hosting;
 using sassy.bulk.BuilderFactory;
-using sassy.bulk.DataGenerator;
+using sassy.bulk.UIUtil;
 using System;
 using System.Threading.Tasks;
 
@@ -21,16 +21,14 @@ namespace sassy.bulk
             host = ExeExtensions.AddSettings(args).Build();
             var program = ProgramFactory.InitilizeServiceFactory();
             program.RunProgram().ConfigureAwait(false);
-            var data = Data.GenerateSampleData(10);
-            foreach(var i in data)
-            {
-                Console.WriteLine(i.FirstName + i.LastName);
-            }
-            Console.ReadKey();
+
+            var restart = new RestartApplication();
+            restart.StartScreen();
         }
         private async Task RunProgram()
         {
-            _log.Welcome($"Ebad Hassan");
+            var main = new MainScreen();
+            main.StartScreen();
         }
     }
 }
