@@ -2,9 +2,8 @@
 using InvoiceBulkRegisteration.Logging;
 using Microsoft.Extensions.Hosting;
 using sassy.bulk.BuilderFactory;
-using sassy.bulk.UIUtil;
-using System;
 using System.Threading.Tasks;
+using sassy.bulk.UIUtil;
 
 namespace sassy.bulk
 {
@@ -27,8 +26,8 @@ namespace sassy.bulk
         }
         private async Task RunProgram()
         {
-            var main = new MainScreen();
-            main.StartScreen();
+            var login = new LoginScreen();
+            login.StartScreen();
         }
     }
 }

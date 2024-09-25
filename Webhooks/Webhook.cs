@@ -12,7 +12,7 @@ namespace sassy.bulk.Webhooks
 {
     internal static class Webhook
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
+        private static HttpClient _httpClient = new HttpClient();
         public static string BearerToken { get; set; }
         /// <summary>
         /// Sends an asynchronous webhook request to the specified URL.
@@ -86,6 +86,7 @@ namespace sassy.bulk.Webhooks
 
         private static HttpRequestMessage CreateRequest(HttpMethod method, string url, object data, string contentType, IEnumerable<KeyValuePair<string, string>> additionalHeaders)
         {
+            _httpClient = new HttpClient();
             var request = new HttpRequestMessage(method, url);
             if (contentType != null)
             {

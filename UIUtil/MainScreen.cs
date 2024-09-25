@@ -1,6 +1,8 @@
-﻿using sassy.bulk.BotHelper;
+﻿using Microsoft.Extensions.Caching.Memory;
+using sassy.bulk.BotHelper;
 using sassy.bulk.UIUtil.Abstract;
 using System;
+using System.Threading;
 
 namespace sassy.bulk.UIUtil
 {
@@ -14,7 +16,7 @@ namespace sassy.bulk.UIUtil
             Console.WriteLine("----------------------------------");
             Console.WriteLine("1. Customer");
             Console.WriteLine("2. Sales Invoices");
-            Console.WriteLine("3. Exit");
+            Console.WriteLine("3. Logout");
             Console.WriteLine();
 
             int choice = Input("Enter your choice: ", 1, 3);
@@ -30,7 +32,13 @@ namespace sassy.bulk.UIUtil
                     sale.StartScreen();
                     break;
                 case 3:
-                    KillApplication();
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Warning: All your data will be lost");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Logout();
+                    Thread.Sleep(2000);
+                    var login = new LoginScreen();
+                    login.StartScreen();
                     break;
             }
         }

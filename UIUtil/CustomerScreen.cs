@@ -14,9 +14,10 @@ namespace sassy.bulk.UIUtil
             Console.WriteLine("1. Add Customer Auto");
             Console.WriteLine("2. Add Customer Manually");
             Console.WriteLine("3. Verify Customer from App");
+            Console.WriteLine("4. Back");
             Console.WriteLine();
 
-            int choice = Input("Enter your choice: ", 1, 3);
+            int choice = Input("Enter your choice: ", 1, 4);
             switch (choice)
             {
                 case 1:
@@ -27,12 +28,12 @@ namespace sassy.bulk.UIUtil
                     var takeCustomerDetails = new TakeCustomerDetail();
                     takeCustomerDetails.StartScreen();
                     break;
-                    case 3:
+                case 3:
                     var verify = new DBCustomer();
                     verify.StartScreen();
                     break;
-                default:
-                    Console.WriteLine("Invalid choice. Please try again.");
+                case 4:
+                    Back();
                     break;
             }
 

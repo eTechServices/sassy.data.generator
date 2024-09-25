@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using sassy.bulk.DBContext;
+using sassy.bulk.RequestDto;
 using sassy.bulk.ResponseDto;
-using System;
-using System.Threading;
 
 namespace sassy.bulk.UIUtil.Abstract
 {
@@ -49,6 +51,26 @@ namespace sassy.bulk.UIUtil.Abstract
                 }
 
                 Console.WriteLine("Invalid input. Please enter a number between " + minValue + " and " + maxValue + ".");
+            }
+        }
+        /// <summary>
+        /// Prompts the user for an integer input within a specified range.
+        /// </summary>
+        /// <param name="prompt">The prompt to display to the user.</param>
+        /// <returns>The valid integer input provided by the user.</returns>
+        public int InputInt(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                string input = Console.ReadLine();
+
+                if (int.TryParse(input, out int choice))
+                {
+                    return choice;
+                }
+
+                Console.WriteLine("Invalid input. Please enter a valid number");
             }
         }
         /// <summary>
@@ -120,6 +142,50 @@ namespace sassy.bulk.UIUtil.Abstract
             Console.WriteLine($"Message received => {result.Message}");
             Console.WriteLine($"Data Received => {JsonConvert.SerializeObject(result.Data)}");
         }
+        /// <summary>
+        /// Logs out the current user by disposing the underlying Stack object.
+        /// </summary>
+        public void Logout() => Stack.Dispose();
+        /// <summary>
+        /// Retrieves data from the cache using the specified key.
+        /// </summary>
+        /// <param name="key">The key of the cached data.</param>
+        /// <returns>The cached data, or null if not found.</returns>
+        public object GetData(string key) => Stack.Get(key);
+        /// <summary>
+        /// Prints the given data to the console.
+        /// </summary>
+        /// <param name="data">The data to print.</param>
+        public void PrintData(string data)
+        {
+            Console.WriteLine(data);
+        }
+        /// <summary>
+        /// Creates a list of key-value pairs representing HTTP headers.
+        /// </summary>
+        /// <returns>A list of key-value pairs containing the HTTP headers.</returns>
+        public List<KeyValuePair<string,string>> AddHeaders()
+        {
+            var headers = new List<KeyValuePair<string, string>>();
+            headers.Add(new KeyValuePair<string, string>("Referer", RequestHeaders.Referer));
+            headers.Add(new KeyValuePair<string, string>("Wlid", RequestHeaders.Wlid));
+            return headers;
+        }
+        /// <summary>
+        /// Navigates back to the main screen.
+        /// </summary>
+        public void Back()
+        {
+            var main = new MainScreen();
+            main.StartScreen();
+        }
+        /// <summary>
+        /// Validates whether the given username and password are not empty.
+        /// </summary>
+        /// <param name="userName">The username to validate.</param>
+        /// <param name="password">The password to validate.</param>
+        /// <returns>True if both username and password are not empty, otherwise false.</returns>
+        public bool IsValidInput(string userName, string password) => !string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password);
         private bool IsValidInput(string input) => !string.IsNullOrEmpty(input);
         
     }
