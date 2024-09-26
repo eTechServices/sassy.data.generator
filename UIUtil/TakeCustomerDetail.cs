@@ -1,5 +1,4 @@
 ﻿using InvoiceBulkRegisteration.Dtos;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using sassy.bulk.UIUtil.Abstract;
 using System;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -32,7 +31,7 @@ namespace sassy.bulk.UIUtil
                 case 1:
                     Login();
                     break;
-                    case 2:
+                case 2:
                     KillApplication();
                     break;
             }
@@ -70,6 +69,7 @@ namespace sassy.bulk.UIUtil
             var builder = new StringBuilder();
             builder.Append(ClientEndPoints.BaseSassylUrl);
             builder.Append(ClientEndPoints.AuthService);
+            builder.Append(ClientEndPoints.Api);
             builder.Append(ClientEndPoints.SignIn);
             string formattedEndpoint = builder.ToString();
 
@@ -102,8 +102,54 @@ namespace sassy.bulk.UIUtil
                 Stack.Insert(CacheKey.Password, password);
                 Stack.Insert(CacheKey.BusinessName, busineeName);
                 Stack.Insert(CacheKey.UserId, userId);
+
+                var details = await GetCustomerDataAsync(token.Token).ConfigureAwait(false);
+                
+                Stack.Insert(CacheKey.DisplayName,details.DisplayName);
+                Stack.Insert(CacheKey.CompanyName, details.CompanyName);
+                Stack.Insert(CacheKey.Country, details.Country);
+                Stack.Insert(CacheKey.State, details.State);
+                Stack.Insert(CacheKey.Type, details.Type);
+                Stack.Insert(CacheKey.PhoneNumber, details.PhoneNumber);
+                Stack.Insert(CacheKey.FirstName, details.FirstName);
             }
+            if (responseObj.Message == "Resource not found") return true;
             return false;
+        }
+        private async Task<GraphClientResponseDto> GetCustomerDataAsync(string token)
+        {
+            var customerdata = new GraphClientResponseDto();
+            Webhook.BearerToken = token;
+            var builder = new StringBuilder();
+            builder.Append(ClientEndPoints.BaseSassylUrl);
+            builder.Append(ClientEndPoints.AccountService);
+            builder.Append(ClientEndPoints.Api);
+            builder.Append(ClientEndPoints.GraphClientApi);
+
+            var formattedString = builder.ToString();
+            var response = await Webhook.SendAsync(formattedString, SendUserCredentials(), "application/json", AddHeaders()).ConfigureAwait(false);
+
+            var stringContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseObj = JsonConvert.DeserializeObject<Connect360Response>(stringContent);
+
+            if (responseObj.Success)
+            {
+                var userData = JsonConvert.DeserializeObject<GraphClientResponseDto>(JsonConvert.SerializeObject(responseObj.Data));
+
+                if (userData != null)
+                {
+                    return userData;
+                }
+            }
+            if (!responseObj.Success)
+            {
+                Console.WriteLine("-------------------------------------");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Something wrong data is not avaibale");
+                Console.WriteLine($"Message: {responseObj.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            return customerdata;
         }
     }
 }

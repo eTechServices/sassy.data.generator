@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using sassy.bulk.Cache;
 using sassy.bulk.DBContext;
 using sassy.bulk.RequestDto;
 using sassy.bulk.ResponseDto;
@@ -109,7 +110,16 @@ namespace sassy.bulk.UIUtil.Abstract
             double percentage = (double)currentIteration / totalIterations * 100;
             Math.Round(percentage);
             Console.Write("\r");
-            Console.Write($"Loading... {percentage}%");
+            if (percentage != 100.0)
+            {
+                Console.Write($"Loading... {percentage}%");
+            }
+            if (percentage == 100.0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Completed.....");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
         }
 
         /// <summary>
@@ -127,8 +137,9 @@ namespace sassy.bulk.UIUtil.Abstract
                 {
                     return input;
                 }
-
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Invalid input. Please try again.");
+                Console.ForegroundColor = ConsoleColor.White;
             }
         }
         /// <summary>
@@ -146,6 +157,10 @@ namespace sassy.bulk.UIUtil.Abstract
         /// Logs out the current user by disposing the underlying Stack object.
         /// </summary>
         public void Logout() => Stack.Dispose();
+        /// <summary>
+        /// Display the current logged in user business name.
+        /// </summary>
+        private void DisplayCurrentBusiness() => Console.WriteLine(GetData(CacheKey.BusinessName).ToString());
         /// <summary>
         /// Retrieves data from the cache using the specified key.
         /// </summary>
@@ -186,7 +201,67 @@ namespace sassy.bulk.UIUtil.Abstract
         /// <param name="password">The password to validate.</param>
         /// <returns>True if both username and password are not empty, otherwise false.</returns>
         public bool IsValidInput(string userName, string password) => !string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password);
+        /// <summary>
+        /// Prepaire the headers for current to includes in webhooks headers request.
+        /// </summary>
+        /// <param name="pageNo">The page no of results to display</param>
+        /// <param name="pageSize">The page size to display number of records per page.</param>
+        /// <param name="filterValue">The value to filter the records from db.</param>
+        /// <param name="startDate">The start date of data sort accordingly.</param>
+        /// <param name="endDate">The end data of data to be sort accordingly.</param>
+        /// <returns></returns>
+        public RequestBody PrepaireRequestBody(int pageNo = 0, int pageSize = 20, string filterValue = "", string startDate = "", string endDate = "")
+        {
+            var body = new RequestBody();
+            body.PageNo = pageNo;
+            body.PageSize = pageSize;
+            body.FilterValue = filterValue;
+            body.StartDate = startDate;
+            body.EndDate = endDate;
+            return body;
+        }
+        /// <summary>
+        /// Display JSON data in pretty format on the console.
+        /// </summary>
+        /// <param name="connect">The object of Connect360 response.</param>
+        public void DisplayPrettyData(Connect360Response connect) => Console.WriteLine(JsonConvert.SerializeObject(connect.Data, Formatting.Indented));
+        /// <summary>
+        /// Validate the string is not empty or not includes empty spaces.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         private bool IsValidInput(string input) => !string.IsNullOrEmpty(input);
+        /// <summary>
+        /// Prepaire the body request to get the user data through Webhook.
+        /// </summary>
+        /// <returns></returns>
+        public UserDataRequestDto SendUserCredentials()
+        {
+            var request = new UserDataRequestDto()
+            {
+                Name = "GETUSERBYUSERNAME",
+                Parameter = new UserParameter()
+                {
+                    UserName = GetData(CacheKey.UserName).ToString()
+                }
+            };
+            return request;
+        }
+        /// <summary>
+        /// Display the current logged in user data on console.
+        /// </summary>
+        public string DisplayUserData()
+        {
+            string userName = GetData(CacheKey.DisplayName).ToString();
+            Console.WriteLine($"----------Current logged in user data----------");
+            Console.WriteLine($"Name: {GetData(CacheKey.DisplayName)}");
+            Console.WriteLine($"Contact Number: {GetData(CacheKey.PhoneNumber)}");
+            Console.WriteLine($"Business Name: {GetData(CacheKey.CompanyName)}");
+            Console.WriteLine($"Country: {GetData(CacheKey.Country)}");
+            Console.WriteLine($"State: {GetData(CacheKey.State)}");
+            Console.WriteLine($"User Type: {GetData(CacheKey.Type)}");
+            return userName;
+        }
         
     }
 }

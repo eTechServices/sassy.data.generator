@@ -10,6 +10,15 @@ namespace sassy.bulk.Dtos
 {
     public class SaleInvoiceDto
     {
+        public SaleInvoiceDto()
+        {
+            string prefix = "RMA";
+            string suffix = "ZSV";
+            Random random = new Random();
+            int randomNumber = random.Next(1, 999);
+            string randomString = $"{prefix}{randomNumber}{DateTimeOffset.Now.ToUnixTimeSeconds().ToString()}_auto_{suffix}";
+            InvoiceNumber = randomString;
+        }
         [JsonProperty("orderNo")]
         public int OrderNo { get; set; } = 1;
         [JsonProperty("invoiceNumber")]
@@ -32,8 +41,8 @@ namespace sassy.bulk.Dtos
         [JsonProperty("registerName")]
         public string RegisterName { get; set; } = "Judaic";
         [JsonProperty("userId")]
-        public string UserId { get; set; } = "cace4d43-4924-4823-aa89-324fdc912474";
-        public string UserName { get; set; } = "Shamim";
+        public string UserId { get; set; } 
+        public string UserName { get; set; }
         public bool IsReturned { get; set; } = false;
         public bool TaxExempt { get; set; } = false;
         public PostedStatus PostedStatus { get; set; }
@@ -54,9 +63,9 @@ namespace sassy.bulk.Dtos
         public decimal LoyaltyAward { get; set; } = decimal.Zero;
         public decimal TaxableTotals { get; set; } = decimal.Zero;
         public decimal NonTaxableTotals { get; set; } = decimal.Zero;
-        public DateTime Started { get; set; }
-        public DateTime Ended { get; set; }
-        public DateTime Dated { get; set; }
+        public DateTime Started { get; set; } = DateTime.UtcNow;
+        public DateTime Ended { get; set; } = DateTime.UtcNow;
+        public DateTime Dated { get; set; } = DateTime.UtcNow;
         public decimal TenderedAmount { get; set; } = decimal.Zero;
         public decimal CashAmount { get; set; } = decimal.Zero;
         public decimal CreditCardAmount { get; set; } = decimal.Zero;
