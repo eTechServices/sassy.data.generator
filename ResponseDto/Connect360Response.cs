@@ -2,7 +2,7 @@
 
 namespace sassy.bulk.ResponseDto
 {
-    internal class Connect360Response
+    public class Connect360Response
     {
         [JsonProperty("success")]
         public bool Success { get; set; }

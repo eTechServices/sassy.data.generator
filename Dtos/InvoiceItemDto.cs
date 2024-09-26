@@ -9,13 +9,13 @@ namespace sassy.bulk.Dtos
 {
     public class InvoiceItemDto
     {
+        public string Id {  get; set; }
         public string InvoiceItemId { get; set; }
         public string InvoiceNumber { get; set; }
         public string DepartmentId { get; set; }
         public string CategoryId { get; set; }
         public string ItemId { get; set; }
         public string ItemSKUId { get; set; }
-        [Required(ErrorMessage = "SKUCode is required")]
         public string SKUCode { get; set; }
         public string ItemName { get; set; }
         public string Image { get; set; }
@@ -38,6 +38,7 @@ namespace sassy.bulk.Dtos
         public TransactionType Type { get; set; }
         [NotMapped]
         public string InvoiceTypeString { get { return Regex.Replace(Type.ToString(), "([a-z])([A-Z])", "$1 $2"); } }
+        [JsonProperty("Discounts")]
         public List<DiscountDto> InvoiceItemDiscounts { get; set; }
         public string OrigionalItemId { get; set; }
         public string Reason { get; set; }

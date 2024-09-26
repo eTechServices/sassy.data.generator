@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using sassy.bulk.BotHelper;
+using sassy.bulk.Cache;
 using sassy.bulk.UIUtil.Abstract;
 using System;
 using System.Threading;
@@ -12,7 +13,7 @@ namespace sassy.bulk.UIUtil
         {
             Clear();
             Console.WriteLine($"{Bot.Welcome}");
-            Console.WriteLine("Welcome to SassyPOS Bulk Data Entry");
+            Console.WriteLine($"Welcome {GetData(CacheKey.DisplayName)} to SassyPOS Bulk Data Entry");
             Console.WriteLine("----------------------------------");
             Console.WriteLine("1. Customer");
             Console.WriteLine("2. Sales Invoices");

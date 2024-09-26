@@ -1,8 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using InvoiceBulkRegisteration.Dtos;
+using Newtonsoft.Json;
+using sassy.bulk.Cache;
 using sassy.bulk.DataGenerator;
+using sassy.bulk.Endpoints;
 using sassy.bulk.UIUtil.Abstract;
+using sassy.bulk.Webhooks;
 using System;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace sassy.bulk.UIUtil
 {
@@ -24,10 +30,10 @@ namespace sassy.bulk.UIUtil
                     {
                         case "yes":
                         case "y":
-                            string token = TakeInput("Please enter token to send: ");
                             foreach (var item in fakecustomer)
                             {
                                 int currentIteration = fakecustomer.ToList().IndexOf(item) + 1;
+                                _ = PresistCustomer(item).GetAwaiter().GetResult();
                                 ProgressBar(currentIteration, choice);
                             }
                             break;
@@ -43,6 +49,22 @@ namespace sassy.bulk.UIUtil
                     }
                 }
             }
+        }
+        private async Task<bool> PresistCustomer(SampleCustomerDto customerDto)
+        {
+            if (customerDto != null)
+            {
+                var token = GetData(CacheKey.BearerToken);
+                var builder = new StringBuilder();
+                builder.Append(ClientEndPoints.Localhost);
+                builder.Append(ClientEndPoints.Api);
+                builder.Append(ClientEndPoints.CreateCustomer);
+                var formattedEndpoint = builder.ToString();
+                Webhook.BearerToken = token.ToString();
+                _ = await Webhook.SendAsync(formattedEndpoint, customerDto, "application/json", AddHeaders());
+                return true;
+            }
+            return false;
         }
     }
 }

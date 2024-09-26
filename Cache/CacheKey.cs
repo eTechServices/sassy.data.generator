@@ -7,5 +7,12 @@
         public static string Password { get; private set; } = "password";
         public static string UserId { get; private set; } = "userId";
         public static string BusinessName { get; private set; } = "businessName";
+        public static string DisplayName { get; private set; } = "displayName";
+        public static string FirstName { get; private set; } = "firstName";
+        public static string Country { get; private set; } = "country";
+        public static string State { get; private set; } = "state";
+        public static string PhoneNumber { get; private set; } = "phoneNumber";
+        public static string CompanyName { get; private set; } = "companyName";
+        public static string Type { get; private set; } = "type";
     }
 }
