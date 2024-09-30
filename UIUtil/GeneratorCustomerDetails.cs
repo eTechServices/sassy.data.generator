@@ -24,6 +24,7 @@ namespace sassy.bulk.UIUtil
                 var fakecustomer = Trainner.GetCustomerData(choice);
                 if (fakecustomer.Count() > 0)
                 {
+                    int i = 1;
                     Console.WriteLine("Do you want to save it to Sassy POS");
                     string input = Input("Yes or No: ");
                     var tracker = Stopwatch.StartNew();
@@ -34,6 +35,7 @@ namespace sassy.bulk.UIUtil
                             foreach (var item in fakecustomer)
                             {
                                 int currentIteration = fakecustomer.ToList().IndexOf(item) + 1;
+                                item.Id = item.Id + i++;
                                 _ = PresistCustomer(item).GetAwaiter().GetResult();
                                 ProgressBar(currentIteration, choice);
                             }
@@ -45,7 +47,7 @@ namespace sassy.bulk.UIUtil
                             foreach (var item in fakecustomer)
                             {
                                 Console.ForegroundColor = ConsoleColor.Yellow;
-                                int currentIteration = fakecustomer.ToList().IndexOf(item) + 1;
+                                item.Id = item.Id + i++;
                                 PrintData(JsonConvert.SerializeObject(item,Formatting.Indented));
                             }
                             tracker.Stop();

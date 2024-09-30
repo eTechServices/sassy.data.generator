@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using sassy.bulk.BotHelper;
 using sassy.bulk.Cache;
 using sassy.bulk.DBContext;
-using sassy.bulk.Endpoints;
 using sassy.bulk.Enums;
 using sassy.bulk.RequestDto;
 using sassy.bulk.ResponseDto;
@@ -27,7 +25,7 @@ namespace sassy.bulk.UIUtil
             Console.WriteLine("1. Login");
             Console.WriteLine("2. Exit");
             Console.WriteLine();
-            int choice = Input("Enter you choice: ", 1, 2);
+            int choice = Input("Enter your choice: ", 1, 2);
             switch (choice)
             {
                 case 1:
@@ -70,20 +68,15 @@ namespace sassy.bulk.UIUtil
         private async Task<bool> CheckClientCredentails(string userName, string password)
         {
             var requestBody = new SIgninRequestDto();
-            var builder = new StringBuilder();
-            builder.Append(ClientEndPoints.BaseSassylUrl);
-            builder.Append(ClientEndPoints.AuthService);
-            builder.Append(ClientEndPoints.Api);
-            builder.Append(ClientEndPoints.SignIn);
-            string formattedEndpoint = builder.ToString();
 
             requestBody.UserName = userName;
             requestBody.Password = password;
+
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Verifying account.......");
             Console.ForegroundColor = ConsoleColor.White;
 
-            var result = await Webhook.SendAsync(formattedEndpoint, requestBody, "application/json", AddHeaders()).ConfigureAwait(false);
+            var result = await Webhook.SendAsync(SignInUrl(), requestBody, "application/json", AddHeaders()).ConfigureAwait(false);
 
             var stringContent = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
             var responseObj = JsonConvert.DeserializeObject<Connect360Response>(stringContent);
@@ -126,14 +119,8 @@ namespace sassy.bulk.UIUtil
         {
             var customerdata = new GraphClientResponseDto();
             Webhook.BearerToken = token;
-            var builder = new StringBuilder();
-            builder.Append(ClientEndPoints.BaseSassylUrl);
-            builder.Append(ClientEndPoints.AccountService);
-            builder.Append(ClientEndPoints.Api);
-            builder.Append(ClientEndPoints.GraphClientApi);
 
-            var formattedString = builder.ToString();
-            var response = await Webhook.SendAsync(formattedString, SendUserCredentials(), "application/json", AddHeaders()).ConfigureAwait(false);
+            var response = await Webhook.SendAsync(GraphClientUrl(), SendUserCredentials(), "application/json", AddHeaders()).ConfigureAwait(false);
 
             var stringContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var responseObj = JsonConvert.DeserializeObject<Connect360Response>(stringContent);
