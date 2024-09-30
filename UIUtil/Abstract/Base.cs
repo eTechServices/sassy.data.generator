@@ -286,7 +286,7 @@ namespace sassy.bulk.UIUtil.Abstract
         public string DisplayUserData()
         {
             string userName = GetData(CacheKey.DisplayName).ToString();
-            Console.WriteLine($"----------Current logged in user data----------");
+            Console.WriteLine($"----------Current User Information----------");
             Console.WriteLine($"Name: {GetData(CacheKey.DisplayName)}");
             Console.WriteLine($"Contact Number: {GetData(CacheKey.PhoneNumber)}");
             Console.WriteLine($"Business Name: {GetData(CacheKey.CompanyName)}");

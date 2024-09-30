@@ -14,5 +14,8 @@
         public static string PhoneNumber { get; private set; } = "phoneNumber";
         public static string CompanyName { get; private set; } = "companyName";
         public static string Type { get; private set; } = "type";
+        public static string LocationList { get; private set; } = "locationList";
+        public static string RegisterList { get; private set; } = "registerList";
+        public static string CustomerList { get; private set; } = "customerList";
     }
 }

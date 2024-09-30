@@ -20,5 +20,6 @@
         public static string GraphClientApi { get; private set; } = "B2CGraphClientApi";
         public static string SignIn { get; private set; } = "SignIn";
         public static string InvoiceFilter { get; private set; } = "Invoice/FilterInvoice";
+        public static string Configurations { get; private set; } = "AllFilters";
     }
 }

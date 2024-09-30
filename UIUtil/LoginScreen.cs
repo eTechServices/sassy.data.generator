@@ -27,7 +27,7 @@ namespace sassy.bulk.UIUtil
             Console.WriteLine("1. Login");
             Console.WriteLine("2. Exit");
             Console.WriteLine();
-            int choice = Input(">>>>> ", 1, 2);
+            int choice = Input("Enter you choice: ", 1, 2);
             switch (choice)
             {
                 case 1:
