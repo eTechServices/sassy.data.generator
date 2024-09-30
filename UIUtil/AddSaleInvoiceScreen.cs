@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using sassy.bulk.Cache;
+using sassy.bulk.DBContext;
 using sassy.bulk.Dtos;
 using sassy.bulk.Endpoints;
+using sassy.bulk.Enums;
 using sassy.bulk.ResponseDto;
 using sassy.bulk.UIUtil.Abstract;
 using sassy.bulk.Webhooks;
@@ -16,6 +18,7 @@ namespace sassy.bulk.UIUtil
 {
     public class AddSaleInvoiceScreen : Base
     {
+        private ObjectResponse ConfigurationData = new ObjectResponse();
         private int CuNoOfItems { get; set; } = 0;
         private decimal CuTipAmount { get; set; } = 0;
         private decimal CuTenderedAmount { get; set; } = 0;
@@ -24,15 +27,35 @@ namespace sassy.bulk.UIUtil
         private decimal CuRewardAmount { get; set; } = 0;
         private decimal CuOtherChargesAmount { get; set; } = 0;
         private decimal CuCashDiscountAmount { get; set; } = 0;
+        private decimal SubTotal { get; set; } = 0;
+        private decimal GrandTotal { get; set; } = 0;
         private string CuNote { get; set; } = "";
+        private string CustomerType { get; set; } = "";
+        private string LocationName { get; set; } = "";
+        private string RegisterName { get; set; } = "";
+        private string RegisterId { get; set; } = "";
+        private string LocationId { get; set; } = "";
+        private string CustomerId { get; set; } = "";
+        private string CustomerName { get; set; } = "";
 
         public override void StartScreen()
         {
+            begin:
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            
             var displayUser = DisplayUserData();
-            label:
+            DisplayCustomerType();
+            DisplayLocationsAndRegisters().GetAwaiter().GetResult();
+            Console.ForegroundColor = ConsoleColor.White;
+            
+            takeData:
             var invoiceData = new SaleInvoiceDto();
             int indexer = InputInt($"{displayUser} how many records you want to add?: ");
-            
+
+            AskForCustomerType();
+            AskForLocation();
+            AskForRegister();
+
             CuNoOfItems = GetNumberOfItems();
             CuTipAmount = GetDecimalInput("Tip amount");
             CuTenderedAmount = GetDecimalInput("Tendered amount");
@@ -43,7 +66,9 @@ namespace sassy.bulk.UIUtil
             CuCashDiscountAmount = GetDecimalInput("Cash discount amount");
             CuNote = TakeInput("PLease Enter Customer Note: ");
 
+
             PromptToEdit();
+            GetCustomerList().GetAwaiter().GetResult();
 
             invoiceData.TipAmount = CuTipAmount;
             invoiceData.TenderedAmount = CuTenderedAmount;
@@ -59,41 +84,124 @@ namespace sassy.bulk.UIUtil
             invoiceData.InvoiceProductNotes = AddNotes(invoiceData);
             invoiceData.ElectronicTenders = AddElectronicTender(invoiceData);
             invoiceData.InvoiceTenders = AddTenderList(invoiceData);
+            invoiceData.SubTotal = SubTotal;
+            invoiceData.CustomerNote = CuNote;
+            invoiceData.GrandTotal = Total();
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Your Task is started take a while we complete......");
-            var sw = Stopwatch.StartNew();
-            Console.WriteLine($"Started at: {DateTime.Now}");
+            PrepaireData();
+            PickRandomCustomer();
 
-            for (int i = 0; i < indexer; i++)
+            invoiceData.CustomerId = CustomerId;
+            invoiceData.CustomerName = CustomerName;
+            invoiceData.LocationName = LocationName;
+            invoiceData.locationId = LocationId;
+            invoiceData.RegisterName = RegisterName;
+            invoiceData.RegisterId = RegisterId;
+
+            var tryagain = BeginThread(invoiceData, indexer).GetAwaiter().GetResult();
+
+            if (!tryagain)
             {
-                Console.WriteLine("\rGenerating invoices... ({0}/{1})", i + 1, indexer);
-                invoiceData.InvoiceNumber = RandomInvoiceNo();
-                var isSaved = StartInvoiceTaskAsync(invoiceData).GetAwaiter().GetResult();
-                if (!isSaved)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Invoice No {invoiceData.InvoiceNumber} failed to saved.");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    string strtAgain = Input("\rDo you want to start again?:");
-                    if (strtAgain == "yes" || strtAgain == "y")
-                    {
-                        goto label;
-                    }
-                }
+                goto takeData;
             }
-
-            sw.Stop();
-            Console.ForegroundColor = ConsoleColor.White;
-            DisplayCompletionTime(sw.Elapsed);
 
             string anotherThread = Input("Add another?: ");
             if (anotherThread == "yes" || anotherThread == "y")
             {
-                goto label;
+                Console.Clear();
+                goto begin;
             }
         }
-        private bool PromptToEdit()
+        private void AskForLocation()
+        {
+            LocationName = TakeInput("Please Enter location name: ");
+        }
+        private void AskForRegister()
+        {
+            RegisterName = TakeInput("PLease Enter Register Name: ");
+        }
+        private void AskForCustomerType()
+        {
+            while (true)
+            {
+                CustomerType customerType;
+                string inputCustomer = TakeInput("Please enter customer type: ");
+                if (Enum.TryParse(inputCustomer, true, out customerType))
+                {
+                    CustomerType = inputCustomer;
+                    break;
+                }
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Invalid Customer selected");
+                Console.ForegroundColor= ConsoleColor.White;
+            }
+        }
+        private void PrepaireData()
+        {
+            var location = GetData(CacheKey.LocationList) as List<LocationsResponseDto>;
+            var registers = GetData(CacheKey.RegisterList) as List<RegisterResponseDto>;
+
+            if(location.Count > 0)
+            {
+                var findLocationData = location.Where(x => x.LocationName == LocationName).FirstOrDefault();
+                LocationId = findLocationData?.LocationId.ToString();
+                LocationName = findLocationData?.LocationName;
+            }
+            if(registers.Count > 0)
+            {
+                var findRegistersData = registers.Where(x => x.RegisterName == RegisterName).FirstOrDefault();
+                RegisterId = findRegistersData.RegisterId.ToString();
+                RegisterName = findRegistersData?.RegisterName;
+            }
+        }
+        private void PickRandomCustomer()
+        {
+            var random = new Random();
+
+            var customerData = GetData(CacheKey.CustomerList) as List<CustomerDataResponse>;
+
+            if (customerData.Count > 0)
+            {
+                int randomNumber = random.Next(1, 21);
+                if (randomNumber <= customerData.Count)
+                {
+                    var randomCustomer = customerData[randomNumber - 1];
+                    CustomerId = randomCustomer.CustID;
+                    CustomerName = randomCustomer.FirstName + randomCustomer.LastName;
+                }
+            }
+
+        }
+        private async Task GetCustomerList()
+        {
+            var customerDataSet = new List<CustomerDataResponse>();
+            var token = GetData(CacheKey.BearerToken).ToString();
+            
+            var builder = new StringBuilder();
+            builder.Append(ClientEndPoints.BaseSassylUrl);
+            builder.Append(ClientEndPoints.CustomerService);
+            builder.Append(ClientEndPoints.Api);
+            builder.Append(ClientEndPoints.CreateCustomer);
+            if (CustomerType != "")
+            {
+                builder.Append($"?pageNo=0&pageSize=20&type={CustomerType}");
+            }
+
+            var formattedEndpoint = builder.ToString();
+            Webhook.BearerToken = token;
+
+            var responseData = await Webhook.SendAsync<Connect360Response, Connect360Response>(formattedEndpoint, "application/json", AddHeaders()).ConfigureAwait(false);
+            
+            var responseObj = JsonConvert.DeserializeObject<Connect360Response>(JsonConvert.SerializeObject(responseData));
+
+            if(responseObj.Success)
+            {
+               customerDataSet = JsonConvert.DeserializeObject<List<CustomerDataResponse>>(JsonConvert.SerializeObject(responseObj.Data));
+                Stack.Insert(CacheKey.CustomerList, customerDataSet);
+            }
+
+        }
+        private void PromptToEdit()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             string changes = Input("Do you want to make changes?: ");
@@ -112,8 +220,12 @@ namespace sassy.bulk.UIUtil
                 Console.WriteLine("7. Cash Discount: {0}", CuCashDiscountAmount);
                 Console.WriteLine("8. Number of items: {0}", CuNoOfItems);
                 Console.WriteLine("9. Customer Note: {0}", CuNote);
+                Console.WriteLine("10: Customer Type: {0}", CustomerType);
+                Console.WriteLine("11: Location Name: {0}", LocationName);
+                Console.WriteLine("12: Register Name: {0}", RegisterName);
 
-                int choice = Input("Select any option: ", 1, 9);
+                int choice = Input("Select any option: ", 1, 12);
+
                 switch (choice)
                 {
                     case 1:
@@ -134,17 +246,21 @@ namespace sassy.bulk.UIUtil
                         CuNoOfItems = GetNumberOfItems();break;
                     case 9:
                         CuNote = TakeInput("PLease Enter Customer Note: ");break;
+                    case 10:
+                         AskForCustomerType();break;
+                    case 11:
+                        AskForLocation();break;
+                    case 12:
+                        AskForRegister();break;
                 }
+
                 string editOther = Input("Do you want to make another change?: ");
                 
-                if (editOther == "yes" || editOther == "n")
+                if (editOther == "yes" || editOther == "y")
                 {
                     goto EditValues;
                 }
-
-                return true;
             }
-            return false;
         }
         private string RandomInvoiceNo()
         {
@@ -204,6 +320,10 @@ namespace sassy.bulk.UIUtil
             }
             return dataSet;
         }
+
+        private decimal SumTotal(decimal priceA) => SubTotal+=priceA;
+        private decimal Total() => SubTotal - CuCashDiscountAmount;
+
         private List<ElectronicTenderDto> AddElectronicTender(SaleInvoiceDto invoiceDto)
         {
             var dataSet = new List<ElectronicTenderDto>();
@@ -216,6 +336,62 @@ namespace sassy.bulk.UIUtil
                 dataSet.Add(data);
             }
             return dataSet;
+        }
+        private void DisplayCustomerType()
+        {
+            int i = 1;
+            Console.WriteLine("--------------Customer Types---------------");
+            foreach (var customerTypeName in Enum.GetNames(typeof(CustomerType)))
+            {
+                Console.WriteLine($"Customer {i++}: {Enum.Parse(typeof(CustomerType), customerTypeName)}");
+            }
+        }
+        private async Task<ObjectResponse> DisplayLocationsAndRegisters()
+        {
+            var token = GetData(CacheKey.BearerToken).ToString();
+
+            var builder = new StringBuilder();
+            builder.Append(ClientEndPoints.BaseSassylUrl);
+            builder.Append(ClientEndPoints.InventoryService);
+            builder.Append(ClientEndPoints.Api);
+            builder.Append(ClientEndPoints.Configurations);
+
+            var formattedEndpoint = builder.ToString();
+
+            Webhook.BearerToken = token;
+
+            var responseData = await Webhook.SendAsync<Connect360Response, Connect360Response>(formattedEndpoint, "application/json", AddHeaders()).ConfigureAwait(false);
+
+            var responseObj = JsonConvert.DeserializeObject<Connect360Response>(JsonConvert.SerializeObject(responseData));
+
+            if (responseObj.Success)
+            {
+                if(responseObj.Data != null)
+                {
+                    ConfigurationData = JsonConvert.DeserializeObject<ObjectResponse>(JsonConvert.SerializeObject(responseObj.Data));
+                }
+                if (ConfigurationData != null)
+                {
+                    int loc = 1;
+                    int reg = 1;
+                    Console.WriteLine("--------------Available Locations----------------");
+                    
+                    Stack.Insert(CacheKey.RegisterList, ConfigurationData.Registers);
+                    Stack.Insert(CacheKey.LocationList, ConfigurationData.Locations);
+                    
+                    foreach (var location in ConfigurationData.Locations)
+                    {
+                        Console.WriteLine($"Location {loc++}: {location.LocationName}");
+                    }
+                    Console.WriteLine("--------------Available Registers----------------");
+                    foreach (var register in ConfigurationData.Registers)
+                    {
+                        Console.WriteLine($"Register {reg++}: {register.RegisterName}");
+                    }
+                }
+            }
+
+            return ConfigurationData;
         }
         private async Task<List<InvoiceItemDto>> GetRandomInvoiceItems(int toTake, decimal discount, string saleInvoiceId)
         {
@@ -235,6 +411,22 @@ namespace sassy.bulk.UIUtil
                 data.DepartmentId = item.DepartmentId;
                 data.Discount = discount;
                 data.InvoiceId = saleInvoiceId;
+                if(item.ItemSKUs.FirstOrDefault().DefaultPrice == DefaultPrice.SellPriceA)
+                {
+                    data.Price = item.ItemSKUs.FirstOrDefault().SalePriceA;
+                    SumTotal(data.Price);
+                }
+                if(item.ItemSKUs.FirstOrDefault().DefaultPrice == DefaultPrice.SellPriceB)
+                {
+                    data.Price = item.ItemSKUs.FirstOrDefault().SalePriceB;
+                    SumTotal(data.Price);
+                }
+                if(item.ItemSKUs.FirstOrDefault().DefaultPrice == DefaultPrice.SellPriceC)
+                {
+                    data.Price = item.ItemSKUs.FirstOrDefault().SalePriceC;
+                    SumTotal(data.Price);
+                }
+                data.Price = item.ItemSKUs.FirstOrDefault().SalePriceA;
                 data.SoldAs = item.SoldAs;
                 if (item.IsTaxable)
                 {
@@ -322,7 +514,37 @@ namespace sassy.bulk.UIUtil
 
             return items;
         }
-        
+        private async Task<bool> BeginThread(SaleInvoiceDto invoiceData, int indexer)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Your Task is started take a while we complete......");
+            var sw = Stopwatch.StartNew();
+            Console.WriteLine($"Started at: {DateTime.Now}");
+
+            for (int i = 0; i < indexer; i++)
+            {
+                Console.WriteLine("\rGenerating invoices... ({0}/{1})", i + 1, indexer);
+                invoiceData.InvoiceNumber = RandomInvoiceNo();
+                var isSaved = await StartInvoiceTaskAsync(invoiceData).ConfigureAwait(false);
+
+                if (!isSaved)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Invoice No {invoiceData.InvoiceNumber} failed to saved.");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    string strtAgain = Input("\rDo you want to start again?:");
+                    if (strtAgain == "yes" || strtAgain == "y")
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            sw.Stop();
+            Console.ForegroundColor = ConsoleColor.White;
+            DisplayCompletionTime(sw.Elapsed);
+            return true;
+        }
         private async Task<bool> StartInvoiceTaskAsync(SaleInvoiceDto invoiceDto)
         {
             var token = GetData(CacheKey.BearerToken);

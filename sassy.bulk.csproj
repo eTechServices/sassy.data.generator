@@ -215,6 +215,7 @@
     <Compile Include="Cache\CacheKey.cs" />
     <Compile Include="DBContext\Stack.cs" />
     <Compile Include="Enums\AccountStatus.cs" />
+    <Compile Include="Enums\CustomerType.cs" />
     <Compile Include="ModelTrainner\CustomerDtoTrainner.cs" />
     <Compile Include="ModelTrainner\Trainner.cs" />
     <Compile Include="ModelTrainner\InvoiceOtherChargesDtoFaker.cs" />
@@ -257,6 +258,8 @@
     <Compile Include="ResponseDto\CustomerDataResponse.cs" />
     <Compile Include="ResponseDto\GraphClientResponseDto.cs" />
     <Compile Include="ResponseDto\Items.cs" />
+    <Compile Include="ResponseDto\LocationsResponseDto.cs" />
+    <Compile Include="ResponseDto\RegisterResponseDto.cs" />
     <Compile Include="TokenUtil\Decrypt.cs" />
     <Compile Include="TrackApplication\AssemblyInformation.cs" />
     <Compile Include="UIUtil\Abstract\Base.cs" />

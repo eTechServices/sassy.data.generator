@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace sassy.bulk.ResponseDto
 {
@@ -20,5 +21,12 @@ namespace sassy.bulk.ResponseDto
         public string ElapsedTime { get; set; }
         [JsonProperty("showThisMessage")]
         public bool ShowThisMessage { get; set; }
+    }
+    public class ObjectResponse
+    {
+        [JsonProperty("locations")]
+        public List<LocationsResponseDto> Locations { get; set; }
+        [JsonProperty("registers")]
+        public List<RegisterResponseDto> Registers { get; set; }
     }
 }

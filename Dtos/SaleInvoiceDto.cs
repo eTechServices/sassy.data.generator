@@ -24,25 +24,25 @@ namespace sassy.bulk.Dtos
         [JsonProperty("customerPhone")]
         public string CustomerPhone { get; set; } = "9364466690";
         [JsonProperty("locationId")]
-        public string locationId { get; set; } = "1670001";
+        public string locationId { get; set; } = "";
         [JsonProperty("locationName")]
-        public string LocationName { get; set; } = "Bold Vapes- Camp";
+        public string LocationName { get; set; } = "";
         [JsonProperty("registerId")]
-        public string RegisterId { get; set; } = "1670001001";
+        public string RegisterId { get; set; } = "";
         [JsonProperty("registerName")]
-        public string RegisterName { get; set; } = "Judaic";
+        public string RegisterName { get; set; } = "";
         [JsonProperty("userId")]
         public string UserId { get; set; } 
         public string UserName { get; set; }
         public bool IsReturned { get; set; } = false;
         public bool TaxExempt { get; set; } = false;
-        public PostedStatus PostedStatus { get; set; }
+        public PostedStatus PostedStatus { get; set; } = PostedStatus.Completed;
         [NotMapped]
         public string PostedStatusString { get { return Regex.Replace(PostedStatus.ToString(), "([a-z])([A-Z])", "$1 $2"); } }
         public ShippingStatus ShippingStatus { get; set; } = ShippingStatus.Delivered;
         [NotMapped]
         public string ShippingStatusString { get { return Regex.Replace(ShippingStatus.ToString(), "([a-z])([A-Z])", "$1 $2"); } }
-        public TransactionType InvoiceType { get; set; }
+        public TransactionType InvoiceType { get; set; } = TransactionType.Sale;
         [NotMapped]
         public string InvoiceTypeString { get { return Regex.Replace(InvoiceType.ToString(), "([a-z])([A-Z])", "$1 $2"); } }
         public decimal ShippingCost { get; set; } = decimal.Zero;
