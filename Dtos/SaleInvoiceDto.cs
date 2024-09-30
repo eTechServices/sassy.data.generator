@@ -10,15 +10,6 @@ namespace sassy.bulk.Dtos
 {
     public class SaleInvoiceDto
     {
-        public SaleInvoiceDto()
-        {
-            string prefix = "RMA";
-            string suffix = "ZSV";
-            Random random = new Random();
-            int randomNumber = random.Next(1, 999);
-            string randomString = $"{prefix}{randomNumber}{DateTimeOffset.Now.ToUnixTimeSeconds().ToString()}_auto_{suffix}";
-            InvoiceNumber = randomString;
-        }
         [JsonProperty("orderNo")]
         public int OrderNo { get; set; } = 1;
         [JsonProperty("invoiceNumber")]

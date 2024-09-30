@@ -77,55 +77,11 @@ namespace sassy.bulk.Webhooks
             }
             catch (BulkDataExeException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 PrintException(ex);
+                Console.ForegroundColor = ConsoleColor.White;
             }
             return null;
-        }
-        /// <summary>
-        /// Sends an asynchronous GET request to the specified URL.
-        /// </summary>
-        /// <typeparam name="TResponse">The type of data expected in the response body.</typeparam>
-        /// <param name="endPoint">The URL of the endpoint to retrieve data from.</param>
-        /// <param name="contentType">The content type expected in the response body.</param>
-        /// <param name="requestParameter">Optional request parameters to be included in the URL as query string parameters.</param>
-        /// <param name="additionalHeaders">Optional additional headers to be included in the request.</param>
-        /// <returns>A task that returns a TResponse object deserialized from the response body.</returns>
-        /// <exception cref="WebhookException">Throws a WebhookException if an error occurs during the request or response deserialization.</exception>
-        //public static async Task<TResponse> GetAsync<TResponse>(string endPoint, string contentType, object requestParameter = null, IEnumerable<KeyValuePair<string, string>> additionalHeaders = null, CancellationToken token = default)
-        //{
-        //    var request = CreateRequest(HttpMethod.Get, endPoint, requestParameter, contentType, additionalHeaders);
-        //    token.ThrowIfCancellationRequested();
-        //    HttpResponseMessage response = null;
-        //    try
-        //    {
-        //        response = await _httpClient.SendAsync(request, token).ConfigureAwait(false);
-        //    }
-        //    catch (BulkDataExeException ex)
-        //    {
-        //        PrintException(ex);
-        //    }
-
-        //    HandleResponse(response);
-
-        //    TResponse data;
-        //    try
-        //    {
-        //        var json = await response.Content.ReadAsStringAsync();
-        //        data = JsonConvert.DeserializeObject<TResponse>(json);
-        //    }
-        //    catch (BulkDataExeException ex)
-        //    {
-        //        PrintException(ex);
-        //    }
-        //    return data;
-        //}
-        private static async void HandleResponse(HttpResponseMessage response)
-        {
-            if (!response.IsSuccessStatusCode)
-            {
-                string responseContent = await response.Content.ReadAsStringAsync();
-                throw new System.Exception($"Webhook failed with status code: {response.StatusCode}. Response content: {responseContent}");
-            }
         }
         private static HttpRequestMessage CreateRequest(HttpMethod method, string url, object data, string contentType, IEnumerable<KeyValuePair<string, string>> additionalHeaders)
         {

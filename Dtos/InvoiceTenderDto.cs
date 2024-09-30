@@ -7,6 +7,7 @@ namespace sassy.bulk.Dtos
 {
     public class InvoiceTenderDto
     {
+        public string Id { get; set; }
         public string InvoiceNumber { get; set; }
         public DateTime Date { get; set; }
         public TenderType TenderType { get; set; }

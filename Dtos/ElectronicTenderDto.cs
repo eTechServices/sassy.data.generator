@@ -4,6 +4,11 @@ namespace sassy.bulk.Dtos
 {
     public class ElectronicTenderDto
     {
+        public ElectronicTenderDto()
+        {
+            Id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+        }
+        public string Id { get; set; }
         public string InvoiceNumber { get; set; }
         public bool IsVoid { get; set; }
         public string ResponseOrigin { get; set; }

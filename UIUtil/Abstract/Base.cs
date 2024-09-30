@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using sassy.bulk.Cache;
 using sassy.bulk.DBContext;
@@ -121,7 +122,6 @@ namespace sassy.bulk.UIUtil.Abstract
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }
-
         /// <summary>
         /// Prompts the user for input and validates it.
         /// </summary>
@@ -151,7 +151,7 @@ namespace sassy.bulk.UIUtil.Abstract
             var result = JsonConvert.DeserializeObject<Connect360Response>(data);
             Console.WriteLine($"The Status is => {result.Success}");
             Console.WriteLine($"Message received => {result.Message}");
-            Console.WriteLine($"Data Received => {JsonConvert.SerializeObject(result.Data)}");
+            Console.WriteLine($"Data Received => {JsonConvert.SerializeObject(result.Data, Formatting.Indented)}");
         }
         /// <summary>
         /// Logs out the current user by disposing the underlying Stack object.
@@ -193,6 +193,39 @@ namespace sassy.bulk.UIUtil.Abstract
         {
             var main = new MainScreen();
             main.StartScreen();
+        }
+        /// <summary>
+        /// Calculate the expected time to complete the insertion of the given task.
+        /// </summary>
+        /// <param name="noOfInvoices">The total number of Invoices to insert in the system.</param>
+        /// <returns></returns>
+        public void ExpectedCompletionTime(int noOfInvoices)
+        {
+            List<Tuple<int, TimeSpan>> insertion = null;
+            double averageInsertionRate = insertion.Average(t => t.Item2.TotalSeconds / t.Item1);
+
+            double estimatedTimeInSeconds = noOfInvoices / averageInsertionRate;
+            TimeSpan estimatedTime = TimeSpan.FromSeconds(estimatedTimeInSeconds);
+
+            Console.WriteLine($"Expected completion time: {estimatedTime.TotalMinutes}");
+        }
+        public void DisplayCompletionTime(TimeSpan timeSpan)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            string elapsedTime = String.Format("{0}:{1}:{2}:{3}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
+            Console.WriteLine("\r");
+            Console.WriteLine($"Completion Time: {elapsedTime}");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        public List<Tuple<int,TimeSpan>> InsertionFrame(int noOfInvoice, TimeSpan timeSpan)
+        {
+            List<Tuple<int, TimeSpan>> insertionData = new List<Tuple<int, TimeSpan>>()
+            {
+                new Tuple<int, TimeSpan>(1000, TimeSpan.FromSeconds(30)),
+                new Tuple<int, TimeSpan>(500, TimeSpan.FromSeconds(15)),
+                new Tuple<int, TimeSpan>(2000, TimeSpan.FromMinutes(2))
+            };
+            return insertionData;
         }
         /// <summary>
         /// Validates whether the given username and password are not empty.
