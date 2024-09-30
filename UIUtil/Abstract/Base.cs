@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Newtonsoft.Json;
 using sassy.bulk.Cache;
 using sassy.bulk.DBContext;
+using sassy.bulk.Endpoints;
 using sassy.bulk.RequestDto;
 using sassy.bulk.ResponseDto;
 
@@ -295,6 +297,33 @@ namespace sassy.bulk.UIUtil.Abstract
             Console.WriteLine($"User Type: {GetData(CacheKey.Type)}");
             return userName;
         }
-        
+        /// <summary>
+        /// Get the Signin client endpoint.
+        /// </summary>
+        /// <returns>The formatted endpoint.</returns>
+        public string SignInUrl()
+        {
+            var builder = new StringBuilder();
+            builder.Append(ClientEndPoints.BaseSassylUrl);
+            builder.Append(ClientEndPoints.AuthService);
+            builder.Append(ClientEndPoints.Api);
+            builder.Append(ClientEndPoints.SignIn);
+
+            return builder.ToString();
+        }
+        /// <summary>
+        /// Get the Graph client api endpoint.
+        /// </summary>
+        /// <returns>The formatted endpoint.</returns>
+        public string GraphClientUrl()
+        {
+            var builder = new StringBuilder();
+            builder.Append(ClientEndPoints.BaseSassylUrl);
+            builder.Append(ClientEndPoints.AccountService);
+            builder.Append(ClientEndPoints.Api);
+            builder.Append(ClientEndPoints.GraphClientApi);
+
+            return builder.ToString();
+        }
     }
 }
