@@ -12,7 +12,9 @@ namespace sassy.bulk.UIUtil
         public override void StartScreen()
         {
             Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine($"{Bot.Welcome}");
+            Console.ForegroundColor= ConsoleColor.White;
             Console.WriteLine($"Welcome {GetData(CacheKey.DisplayName)} to SassyPOS Bulk Data Entry");
             Console.WriteLine("----------------------------------");
             Console.WriteLine("1. Customer");

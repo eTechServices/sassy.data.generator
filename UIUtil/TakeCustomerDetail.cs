@@ -1,8 +1,13 @@
 ﻿using InvoiceBulkRegisteration.Dtos;
 using Newtonsoft.Json;
+using sassy.bulk.Cache;
+using sassy.bulk.Endpoints;
 using sassy.bulk.UIUtil.Abstract;
+using sassy.bulk.Webhooks;
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace sassy.bulk.UIUtil
 {
@@ -21,16 +26,38 @@ namespace sassy.bulk.UIUtil
                 if (isAnother == "yes" || isAnother == "y")
                 {
                     int howMany = InputInt("How many do you want to add: ");
+                    
                     for(int i = 0; i < howMany; i++)
                     {
                         Console.WriteLine($"--------------{dataset.Count}--------------");
                         dataset.Add(TakeDetails());
                     }
+
+                    string presist = Input("Save data?: ");
+                    if (presist == "yes" || presist == "y")
+                    {
+                        PresistCustomer(dataset);
+                    }
                     Console.WriteLine($"{dataset.Count} customers added successfully");
-                    Console.WriteLine(JsonConvert.SerializeObject(dataset));
                 }
                 break;
             }
+        }
+        private void PresistCustomer(List<SampleCustomerDto> dataSet)
+        {
+            var token = GetData(CacheKey.BearerToken);
+            var builder = new StringBuilder();
+            builder.Append(ClientEndPoints.BaseSassylUrl);
+            builder.Append(ClientEndPoints.Api);
+            builder.Append(ClientEndPoints.CreateCustomer);
+            var formattedEndpoint = builder.ToString();
+            Webhook.BearerToken = token.ToString();
+            
+            Parallel.ForEach(dataSet, customer =>
+            {
+                _ = Webhook.SendAsync(formattedEndpoint, customer, "application/json", AddHeaders()).ConfigureAwait(false);
+
+            });
         }
         private SampleCustomerDto TakeDetails()
         {

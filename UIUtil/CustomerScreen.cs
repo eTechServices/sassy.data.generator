@@ -9,11 +9,13 @@ namespace sassy.bulk.UIUtil
         public override void StartScreen()
         {
             Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine($"{Bot.Welcome}");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Select your option below");
             Console.WriteLine("1. Add Customer Auto");
             Console.WriteLine("2. Add Customer Manually");
-            Console.WriteLine("3. Verify Customer from App");
+            Console.WriteLine("3. Search Customer");
             Console.WriteLine("4. Back");
             Console.WriteLine();
 

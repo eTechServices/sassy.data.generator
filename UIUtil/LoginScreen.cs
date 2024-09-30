@@ -20,7 +20,9 @@ namespace sassy.bulk.UIUtil
         public override void StartScreen()
         {
             Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine($"{Bot.Welcome}");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("------------------");
             Console.WriteLine("1. Login");
             Console.WriteLine("2. Exit");
@@ -41,7 +43,9 @@ namespace sassy.bulk.UIUtil
             string userName = "";
             string password = "";
             Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine($"{Bot.Welcome}");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Enter your credentials:");
             Console.WriteLine("-----------------------");
             bool isLoggedIn = true;
@@ -75,8 +79,9 @@ namespace sassy.bulk.UIUtil
 
             requestBody.UserName = userName;
             requestBody.Password = password;
-
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Verifying account.......");
+            Console.ForegroundColor = ConsoleColor.White;
 
             var result = await Webhook.SendAsync(formattedEndpoint, requestBody, "application/json", AddHeaders()).ConfigureAwait(false);
 
@@ -85,6 +90,7 @@ namespace sassy.bulk.UIUtil
             if (responseObj.Success)
             {
                 var token = JsonConvert.DeserializeObject<TokenData>(JsonConvert.SerializeObject(responseObj.Data));
+
                 if (token.AccountStatus != AccountStatus.DeploymentCompleted)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;

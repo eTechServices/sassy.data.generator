@@ -9,7 +9,9 @@ namespace sassy.bulk.UIUtil
         public override void StartScreen()
         {
             Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine($"{Bot.Welcome}");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Select your option below");
             Console.WriteLine("1. Add Sale Invoice");
             Console.WriteLine("2. View Sale Invoice Data");

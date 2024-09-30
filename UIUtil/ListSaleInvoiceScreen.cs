@@ -7,6 +7,7 @@ using sassy.bulk.Endpoints;
 using System.Threading.Tasks;
 using sassy.bulk.ResponseDto;
 using sassy.bulk.UIUtil.Abstract;
+using System.Diagnostics;
 
 namespace sassy.bulk.UIUtil
 {
@@ -21,20 +22,21 @@ namespace sassy.bulk.UIUtil
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Remarks: Data format like (09/05/24)");
             Console.ForegroundColor = ConsoleColor.White;
+            label:
             string startDate = TakeInput("Enter Start Date: ");
             string endDate = TakeInput("Enter End Date: ");
 
             Console.WriteLine("Loading Data.............");
             Console.WriteLine("\r");
+            var tracker = Stopwatch.StartNew();
             data = FetchSalesInvoice(startDate: startDate, endDate: endDate).GetAwaiter().GetResult();
 
             while (true)
             {
-                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("\r");
                 if (data.Data is null)
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("\r");
                     Console.WriteLine("No more data found");
                     Console.ForegroundColor = ConsoleColor.White;
@@ -42,7 +44,9 @@ namespace sassy.bulk.UIUtil
                 }
                 if(data.Data != null)
                 {
+                    tracker.Stop();
                     DisplayPrettyData(data);
+                    DisplayCompletionTime(tracker.Elapsed);
                 }
                 Console.ForegroundColor = ConsoleColor.White;
                 string wantNext = Input("Display next?: ");
@@ -51,16 +55,18 @@ namespace sassy.bulk.UIUtil
                 {
                     break;
                 }
+                tracker.Restart();
                 pageNo++;
                 data = FetchSalesInvoice(pageNo,pageSize).GetAwaiter().GetResult();
             }
 
             string backMenu = Input("Back to menu: ");
-            if(backMenu != "no" || backMenu != "n")
+            if(backMenu == "no" || backMenu == "n")
             {
-                var saleInvoice = new SaleInvoiceScreen();
-                saleInvoice.StartScreen();
+                goto label;
             }
+            var saleInvoice = new SaleInvoiceScreen();
+            saleInvoice.StartScreen();
         }
         private async Task<Connect360Response> FetchSalesInvoice(int pageNo = 0, int pageSize = 10, string filterValue = "", string startDate = "09/19/2024", string endDate = "09/19/2024")
         {

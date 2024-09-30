@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using sassy.bulk.UIUtil.Abstract;
 
 namespace sassy.bulk.UIUtil
@@ -9,6 +10,10 @@ namespace sassy.bulk.UIUtil
         {
             Console.WriteLine("\nDo you want to open the menu?");
             string choice = Input("Yes or No: ");
+            ContinueExecution(choice).GetAwaiter().GetResult();
+        }
+        private async Task ContinueExecution(string choice)
+        {
             switch (choice)
             {
                 case "yes":

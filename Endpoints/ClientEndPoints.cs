@@ -14,7 +14,7 @@
         public static string SaveInvoice { get; private set; } = "SaveInvoiceV1";
         public static string CreateCustomer { get; private set; } = "Customer";
         public static string GetProduct { get; private set; } = "Item?pageNo={{pageNo}}&pageSize={{pageSize}}";
-        public static string GetCustomers { get; private set; } = "Customer?pageNo=0&pageSize=10&type=all";
+        public static string GetCustomers { get; private set; } = "Customer?pageNo=0&pageSize={{pageSize}}&type=all&filterValue={{CName}}";
         public static string SearchCustomer { get; private set; } = "SearchCustomer/";
         public static string SaleInvoice { get; private set; } = "Invoice/SaveInvoiceV1";
         public static string GraphClientApi { get; private set; } = "B2CGraphClientApi";
