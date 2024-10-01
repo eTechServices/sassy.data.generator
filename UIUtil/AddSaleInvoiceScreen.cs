@@ -29,6 +29,7 @@ namespace sassy.bulk.UIUtil
         private decimal CuCashDiscountAmount { get; set; } = 0;
         private decimal SubTotal { get; set; } = 0;
         private decimal GrandTotal { get; set; } = 0;
+        private string CInvoiceNumber { get; set; } = "";
         private string CuNote { get; set; } = "";
         private string CustomerType { get; set; } = "";
         private string LocationName { get; set; } = "";
@@ -59,7 +60,7 @@ namespace sassy.bulk.UIUtil
             CuNoOfItems = GetNumberOfItems();
             CuTipAmount = GetDecimalInput("Tip amount");
             CuTenderedAmount = GetDecimalInput("Tendered amount");
-            CuCashAmount = GetDecimalInput("Cash amount");
+            //CuCashAmount = GetDecimalInput("Cash amount");
             CuCreditCardAmount = GetDecimalInput("Credit card amount");
             CuRewardAmount = GetDecimalInput("Reward disount amount");
             CuOtherChargesAmount = GetDecimalInput("Other charges amount");
@@ -77,6 +78,7 @@ namespace sassy.bulk.UIUtil
             invoiceData.RewardDiscount = CuRewardAmount;
             invoiceData.TotalSaleItems = CuNoOfItems;
             invoiceData.OtherChargesAmount = CuOtherChargesAmount;
+            invoiceData.Discount = CuCashDiscountAmount;
             invoiceData.UserId = GetData(CacheKey.UserId).ToString();
             invoiceData.UserName = displayUser;
             invoiceData.InvoiceItems = GetRandomInvoiceItems(CuNoOfItems, CuCashDiscountAmount, invoiceData.InvoiceNumber).GetAwaiter().GetResult();
@@ -108,7 +110,7 @@ namespace sassy.bulk.UIUtil
             string anotherThread = Input("Add another?: ");
             if (anotherThread == "yes" || anotherThread == "y")
             {
-                Console.Clear();
+                Clear();
                 goto begin;
             }
         }
@@ -118,7 +120,7 @@ namespace sassy.bulk.UIUtil
         }
         private void AskForRegister()
         {
-            RegisterName = TakeInput("PLease Enter Register Name: ");
+            RegisterName = TakeInput("Please Enter Register Name: ");
         }
         private void AskForCustomerType()
         {
@@ -268,8 +270,8 @@ namespace sassy.bulk.UIUtil
             string suffix = "ZSV";
             Random random = new Random();
             int randomNumber = random.Next(1, 999);
-            string randomString = $"{prefix}{randomNumber}{DateTimeOffset.Now.ToUnixTimeSeconds().ToString()}_auto_{suffix}";
-            return randomString;
+            CInvoiceNumber = $"{prefix}{randomNumber}{DateTimeOffset.Now.ToUnixTimeSeconds().ToString()}_auto_{suffix}";
+            return CInvoiceNumber;
         }
         private int GetNumberOfItems()
         {
@@ -314,7 +316,10 @@ namespace sassy.bulk.UIUtil
                 var data = new InvoiceTenderDto();
                 data.InvoiceId = item.InvoiceId;
                 data.InvoiceNumber = item.InvoiceNumber;
-                data.TipAmount = saleInvoice.TipAmount;
+                data.TipAmount = CuTipAmount;
+                data.Amount = CuCashAmount;
+                data.TenderType = TenderType.Cash;
+                data.Date = DateTime.Now;
                 data.CashDiscount = saleInvoice.CashDiscount;
                 dataSet.Add(data);
             }
@@ -474,9 +479,10 @@ namespace sassy.bulk.UIUtil
         private async Task<List<Items>> GetInvoiceItems(int toTake)
         {
             var items = new List<Items>();
-
+            var itemSKU = new List<ItemSKU>();
+            int pageNo = 1;
+            fetchNext:
             var token = GetData(CacheKey.BearerToken).ToString();
-
             string formattedEndpoint = string.Empty;
 
             var builder = new StringBuilder();
@@ -487,7 +493,7 @@ namespace sassy.bulk.UIUtil
             if (toTake > 0 && toTake <= 100)
             {
                 builder.Append(ClientEndPoints.GetProduct);
-                builder.Replace("{{pageNo}}", "1");
+                builder.Replace("{{pageNo}}", $"{pageNo}");
                 builder.Replace("{{pageSize}}", $"{toTake}");
             }
 
@@ -504,14 +510,19 @@ namespace sassy.bulk.UIUtil
             {
                 items = JsonConvert.DeserializeObject<List<Items>>(JsonConvert.SerializeObject(responseObj.Data));
             }
-
+            
             if (!responseObj.Success)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Error: {responseObj.Message}");
                 Console.ForegroundColor = ConsoleColor.White;
             }
-
+            itemSKU = items.SelectMany(x => x.ItemSKUs).Where(x => x.SalePriceA != 0 || x.SalePriceB != 0 || x.SalePriceC != 0).ToList();
+            if(itemSKU.Count == 0 || itemSKU.Count != toTake)
+            {
+                pageNo++;
+                goto fetchNext;
+            }
             return items;
         }
         private async Task<bool> BeginThread(SaleInvoiceDto invoiceData, int indexer)

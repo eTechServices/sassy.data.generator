@@ -61,7 +61,7 @@ namespace sassy.bulk.ResponseDto
         }
         public string DescriptionURL { get; set; }
         public bool PrintAsQRCodeOnReceipt { get; set; }
-        public DateTime LastEdited { get; set; } = DateTime.UtcNow;
+        public DateTime LastEdited { get; set; } = DateTime.Now;
         public string EditedBy { get; set; }
         public string AddedBy { get; set; }
         public string UnitId { get; set; }

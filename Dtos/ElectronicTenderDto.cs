@@ -32,8 +32,8 @@ namespace sassy.bulk.Dtos
         public string AcqRefData { get; set; }
         public string RecordNo { get; set; }
         public string EntryMethod { get; set; }
-        public DateTime? Date { get; set; }
-        public TimeSpan? Time { get; set; }
+        public DateTime? Date { get; set; } = DateTime.Now;
+        public TimeSpan? Time { get; set; } 
         public Guid UID { get; set; }
         public string AID { get; set; }
         public string ApplicationLabel { get; set; }
