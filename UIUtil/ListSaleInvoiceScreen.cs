@@ -57,7 +57,7 @@ namespace sassy.bulk.UIUtil
                 }
                 tracker.Restart();
                 pageNo++;
-                data = FetchSalesInvoice(pageNo,pageSize).GetAwaiter().GetResult();
+                data = FetchSalesInvoice(pageNo,pageSize,startDate: startDate, endDate: endDate).GetAwaiter().GetResult();
             }
 
             string backMenu = Input("Back to menu: ");

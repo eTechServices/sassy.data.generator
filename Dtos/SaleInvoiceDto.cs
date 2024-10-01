@@ -18,11 +18,11 @@ namespace sassy.bulk.Dtos
         public string ReturnInvoiceNumbers { get; set; }
         public IEnumerable<string> ReturnedInvoices { get => ReturnInvoiceNumbers.ToEnumerable(); }
         [JsonProperty("customerId")]
-        public string CustomerId { get; set; } = "OTM2NDQ2NjY5MA==";
+        public string CustomerId { get; set; } = "";
         [JsonProperty("customerName")]
-        public string CustomerName { get; set; } = "A ALVARADO-HERNANDEZ";
+        public string CustomerName { get; set; } = "";
         [JsonProperty("customerPhone")]
-        public string CustomerPhone { get; set; } = "9364466690";
+        public string CustomerPhone { get; set; } = "";
         [JsonProperty("locationId")]
         public string locationId { get; set; } = "";
         [JsonProperty("locationName")]
@@ -54,9 +54,9 @@ namespace sassy.bulk.Dtos
         public decimal LoyaltyAward { get; set; } = decimal.Zero;
         public decimal TaxableTotals { get; set; } = decimal.Zero;
         public decimal NonTaxableTotals { get; set; } = decimal.Zero;
-        public DateTime Started { get; set; } = DateTime.UtcNow;
-        public DateTime Ended { get; set; } = DateTime.UtcNow;
-        public DateTime Dated { get; set; } = DateTime.UtcNow;
+        public DateTime Started { get; set; } = DateTime.Now;
+        public DateTime Ended { get; set; } = DateTime.Now;
+        public DateTime Dated { get; set; } = DateTime.Now;
         public decimal TenderedAmount { get; set; } = decimal.Zero;
         public decimal CashAmount { get; set; } = decimal.Zero;
         public decimal CreditCardAmount { get; set; } = decimal.Zero;

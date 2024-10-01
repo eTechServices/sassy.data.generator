@@ -9,7 +9,7 @@ namespace sassy.bulk.Dtos
     {
         public string Id { get; set; }
         public string InvoiceNumber { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
         public TenderType TenderType { get; set; }
         [NotMapped]
         public string TenderTypeString { get { return Regex.Replace(TenderType.ToString(), "([a-z])([A-Z])", "$1 $2"); } }
