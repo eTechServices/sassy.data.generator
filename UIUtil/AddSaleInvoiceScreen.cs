@@ -91,10 +91,7 @@ namespace sassy.bulk.UIUtil
             invoiceData.GrandTotal = Total();
 
             PrepaireData();
-            PickRandomCustomer();
 
-            invoiceData.CustomerId = CustomerId;
-            invoiceData.CustomerName = CustomerName;
             invoiceData.LocationName = LocationName;
             invoiceData.locationId = LocationId;
             invoiceData.RegisterName = RegisterName;
@@ -335,6 +332,7 @@ namespace sassy.bulk.UIUtil
             foreach (var item in invoiceDto.InvoiceItems)
             {
                 var data = new ElectronicTenderDto();
+                data.Id = 
                 data.InvoiceId = item.InvoiceId;
                 data.InvoiceNumber = item.InvoiceNumber;
                 data.TipAmount = invoiceDto.TipAmount;
@@ -534,8 +532,13 @@ namespace sassy.bulk.UIUtil
 
             for (int i = 0; i < indexer; i++)
             {
+                var random = new Random();
+                PickRandomCustomer();
                 Console.WriteLine("\rGenerating invoices... ({0}/{1})", i + 1, indexer);
                 invoiceData.InvoiceNumber = RandomInvoiceNo();
+                invoiceData.CustomerId = CustomerId;
+                invoiceData.CustomerName = CustomerName;
+                invoiceData.ElectronicTenders.FirstOrDefault().Id = invoiceData.ElectronicTenders.FirstOrDefault().Id + random.Next(1, 9999);
                 var isSaved = await StartInvoiceTaskAsync(invoiceData).ConfigureAwait(false);
 
                 if (!isSaved)
@@ -568,7 +571,7 @@ namespace sassy.bulk.UIUtil
 
             string formattedEndpoint = builder.ToString();
             Webhook.BearerToken = token.ToString();
-            var responseData = await Webhook.SendAsync(formattedEndpoint, invoiceDto,"application/json", AddHeaders()).ConfigureAwait(false);
+            var responseData = await Webhook.SendAsync(formattedEndpoint, invoiceDto, "application/json", AddHeaders()).ConfigureAwait(false);
 
             var stringContent = await responseData.Content.ReadAsStringAsync().ConfigureAwait(false);
             var responseObj = JsonConvert.DeserializeObject<Connect360Response>(stringContent);

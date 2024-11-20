@@ -1,4 +1,6 @@
-﻿namespace sassy.bulk.Enums
+﻿using sassy.bulk.Enums;
+
+namespace sassy.bulk.Dtos
 {
     public class DiscountDto
     {
